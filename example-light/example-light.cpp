@@ -15,16 +15,25 @@ class TurnOff : public sm::Event {
 
 class On : public sm::State<5> {
     void on_enter() override {
-        std::cout << "entering On state" << std::endl;
+        std::cout << "enter On state" << std::endl;
     }
     void on_execute() override {
-        std::cout << "light is on" << std::endl;
+        std::cout << "execute On state" << std::endl;
+    }
+    void on_exit() override {
+        std::cout << "exit On state" << std::endl;
     }
 };
 
 class Off : public sm::State<5> {
     void on_enter() override {
-        std::cout << "entering Off state" << std::endl;
+        std::cout << "enter Off state" << std::endl;
+    }
+    void on_execute() override {
+        std::cout << "execute Off state" << std::endl;
+    }
+    void on_exit() override {
+        std::cout << "exit Off state" << std::endl;
     }
 };
 
@@ -45,8 +54,11 @@ int main() {
         std::cin >> input;
 
         switch(input) {
-            case '1': sm::State<5>::handle(&current, &turn_on); break;
-            case '2': sm::State<5>::handle(&current, &turn_off); break;
+            case '1': turn_on.trigger(); break;
+            case '2': turn_off.trigger(); break;
         }
+
+        sm::State<5>::handle(&current);
+        current->on_execute();
     }
 }

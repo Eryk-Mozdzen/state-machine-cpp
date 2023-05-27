@@ -13,14 +13,14 @@ class State {
 
     Transition transitions[MAX_EVENTS];
 
-    virtual void on_enter() {};
-    virtual void on_execute() {};
-    virtual void on_exit() {};
-
 public:
     State();
     static void link(State<MAX_EVENTS> *from, State<MAX_EVENTS> *to, Event *trigger);
-    static void handle(State<MAX_EVENTS> **st, Event *trigger);
+    static void handle(State<MAX_EVENTS> **st);
+
+    virtual void on_enter() {};
+    virtual void on_execute() {};
+    virtual void on_exit() {};
 };
 
 template<int MAX_EVENTS>
@@ -43,16 +43,37 @@ void State<MAX_EVENTS>::link(State<MAX_EVENTS> *from, State<MAX_EVENTS> *to, Eve
 }
 
 template<int MAX_EVENTS>
-void State<MAX_EVENTS>::handle(State<MAX_EVENTS> **st, Event *event) {
+void State<MAX_EVENTS>::handle(State<MAX_EVENTS> **st) {
+    int trig = 0;
+
     for(int i=0; i<MAX_EVENTS; i++) {
-        if((*st)->transitions[i].trigger==event) {
-            event->on_trigger();
-            (*st)->on_exit();
-            *st = (*st)->transitions[i].next;
-            (*st)->on_enter();
+        if((*st)->transitions[i].trigger==nullptr) {
             return;
         }
+
+        if((*st)->transitions[i].trigger->isTriggered()) {
+            trig = i;
+            break;
+        }
     }
+
+    (*st)->on_exit();
+
+    for(int i=0; i<MAX_EVENTS; i++) {
+        if((*st)->transitions[i].trigger!=nullptr) {
+            (*st)->transitions[i].trigger->clear();
+        }
+    }
+
+    *st = (*st)->transitions[trig].next;
+
+    for(int i=0; i<MAX_EVENTS; i++) {
+        if((*st)->transitions[i].trigger!=nullptr) {
+            (*st)->transitions[i].trigger->clear();
+        }
+    }
+
+    (*st)->on_enter();
 }
 
 }
