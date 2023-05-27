@@ -1,5 +1,5 @@
 #include <iostream>
-#include "state.h"
+#include "state_machine.h"
 
 class TurnOn : public sm::Event {
     void on_trigger() override {
@@ -44,10 +44,10 @@ int main() {
     On on;
     Off off;
 
-    sm::State<5>::link(&on, &off, &turn_off);
-    sm::State<5>::link(&off, &on, &turn_on);
+    sm::StateMachine<5> sm(&on);
 
-    sm::State<5> *current = &on;
+    sm.link(&on, &off, &turn_off);
+    sm.link(&off, &on, &turn_on);
 
     while(true) {
         char input;
@@ -58,7 +58,7 @@ int main() {
             case '2': turn_off.trigger(); break;
         }
 
-        sm::State<5>::handle(&current);
-        current->on_execute();
+        sm.update();
+        sm.execute();
     }
 }
