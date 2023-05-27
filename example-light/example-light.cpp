@@ -44,10 +44,10 @@ int main() {
     On on;
     Off off;
 
-    sm::StateMachine<5> sm(&on);
+    on.transit(&off, &turn_off);
+    off.transit(&on, &turn_on);
 
-    sm.link(&on, &off, &turn_off);
-    sm.link(&off, &on, &turn_on);
+    sm::StateMachine<5> sm(&on);
 
     while(true) {
         char input;
@@ -59,6 +59,5 @@ int main() {
         }
 
         sm.update();
-        sm.execute();
     }
 }

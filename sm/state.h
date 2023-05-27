@@ -17,7 +17,7 @@ class State {
 
 public:
     State();
-    static void link(State<MAX_EVENTS> *from, State<MAX_EVENTS> *to, Event *trigger);
+    void transit(State<MAX_EVENTS> *to, Event *trigger);
     static void handle(State<MAX_EVENTS> **st);
 
     virtual void on_enter() {};
@@ -34,11 +34,11 @@ State<MAX_EVENTS>::State() {
 }
 
 template<int MAX_EVENTS>
-void State<MAX_EVENTS>::link(State<MAX_EVENTS> *from, State<MAX_EVENTS> *to, Event *trigger) {
+void State<MAX_EVENTS>::transit(State<MAX_EVENTS> *to, Event *trigger) {
     for(int i=0; i<MAX_EVENTS; i++) {
-        if(from->transitions[i].next==nullptr) {
-            from->transitions[i].trigger = trigger;
-            from->transitions[i].next = to;
+        if(transitions[i].next==nullptr) {
+            transitions[i].trigger = trigger;
+            transitions[i].next = to;
             return;
         }
     }
