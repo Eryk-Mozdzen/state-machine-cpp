@@ -6,6 +6,7 @@ add_executable(${PROJECT_NAME}
 	"example-light.cpp"
 
     "../sm/event.cpp"
+    "../sm/state.cpp"
 )
 
 include_directories(PUBLIC
