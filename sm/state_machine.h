@@ -91,7 +91,7 @@ void StateMachine<S, E>::update() {
 
     for(int i=0; i<E; i++) {
         if(current->transitions[i].event!=nullptr) {
-            if(current->transitions[i].event->isTriggered()) {
+            if(current->transitions[i].event->is_triggered) {
                 current->state->exit();
                 current = current->transitions[i].next;
                 clear();
