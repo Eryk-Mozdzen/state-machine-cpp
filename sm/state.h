@@ -64,7 +64,6 @@ void State<MAX_EVENTS>::handle(State<MAX_EVENTS> **st) {
     }
 
     (*st)->on_exit();
-    (*st)->clear_all();
     *st = transition->next;
     (*st)->clear_all();
     (*st)->on_enter();
@@ -77,7 +76,7 @@ void State<MAX_EVENTS>::clear_all() {
             return;
         }
 
-        transitions[i].trigger->clear();
+        transitions[i].trigger->is_triggered = false;
     }
 }
 

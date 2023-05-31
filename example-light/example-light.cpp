@@ -2,14 +2,22 @@
 #include "state_machine.h"
 
 class TurnOn : public sm::Event {
-    void on_trigger() override {
-        std::cout << "switch on" << std::endl;
+public:
+    void check(const char c) {
+        if(c=='1') {
+            std::cout << "switch on" << std::endl;
+            sm::Event::trigger();
+        }
     }
 };
 
 class TurnOff : public sm::Event {
-    void on_trigger() override {
-        std::cout << "switch off" << std::endl;
+public:
+    void check(const char c) {
+        if(c=='2') {
+            std::cout << "switch off" << std::endl;
+            sm::Event::trigger();
+        }
     }
 };
 
@@ -53,10 +61,8 @@ int main() {
         char input;
         std::cin >> input;
 
-        switch(input) {
-            case '1': turn_on.trigger(); break;
-            case '2': turn_off.trigger(); break;
-        }
+        turn_on.check(input);
+        turn_off.check(input);
 
         sm.update();
     }
