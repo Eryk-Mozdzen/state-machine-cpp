@@ -5,15 +5,26 @@ namespace sm {
 class Event {
     bool is_triggered;
 
+    virtual void on_clear() {}
+
 protected:
-    Event() : is_triggered{false} {}
-    void trigger() {is_triggered = true;}
+    Event() : is_triggered{false} {
+
+    }
+
+    void trigger() {
+        is_triggered = true;
+    }
 
 public:
-    bool isTriggered() const {return is_triggered;}
+    bool isTriggered() const {
+        return is_triggered;
+    }
 
-    template <int S, int E>
-    friend class StateMachine;
+    void clear() {
+        on_clear();
+        is_triggered = false;
+    }
 };
 
 }

@@ -79,6 +79,7 @@ void StateMachine<S, E>::transit(State *from, State *to, Event *event) {
         if(from_transition->transitions[i].next==nullptr) {
             from_transition->transitions[i].event = event;
             from_transition->transitions[i].next = to_transition;
+            return;
         }
     }
 }
@@ -100,7 +101,7 @@ void StateMachine<S, E>::update() {
 
     for(int i=0; i<E; i++) {
         if(current->transitions[i].event!=nullptr) {
-            if(current->transitions[i].event->is_triggered) {
+            if(current->transitions[i].event->isTriggered()) {
                 current->state->exit();
                 current = current->transitions[i].next;
                 current->state->enter();
@@ -117,11 +118,9 @@ void StateMachine<S, E>::update() {
 template<int S, int E>
 void StateMachine<S, E>::clear() {
     for(int i=0; i<S; i++) {
-        if(states[i].state!=nullptr) {
-            for(int j=0; j<E; j++) {
-                if(states[i].transitions[j].event!=nullptr) {
-                    states[i].transitions[j].event->is_triggered = false;
-                }
+        for(int j=0; j<E; j++) {
+            if(states[i].transitions[j].event!=nullptr) {
+                states[i].transitions[j].event->clear();
             }
         }
     }
