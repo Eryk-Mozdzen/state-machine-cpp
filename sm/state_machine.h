@@ -27,6 +27,7 @@ class StateMachine {
 public:
     StateMachine(State *st);
     void transit(State *from, State *to, Event *event);
+    void start();
     void update();
 };
 
@@ -47,7 +48,6 @@ StateMachine<S, E>::StateMachine(State *st) : current{nullptr} {
 
     states[0].state = st;
     current = &states[0];
-    current->state->enter();
 }
 
 template<int S, int E>
@@ -81,6 +81,15 @@ void StateMachine<S, E>::transit(State *from, State *to, Event *event) {
             from_transition->transitions[i].next = to_transition;
         }
     }
+}
+
+template<int S, int E>
+void StateMachine<S, E>::start() {
+    if(current==nullptr) {
+        return;
+    }
+
+    current->state->enter();
 }
 
 template<int S, int E>
