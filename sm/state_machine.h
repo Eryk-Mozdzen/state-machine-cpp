@@ -103,25 +103,26 @@ void StateMachine<S, E>::update() {
             if(current->transitions[i].event->is_triggered) {
                 current->state->exit();
                 current = current->transitions[i].next;
-                clear();
                 current->state->enter();
                 break;
             }
         }
     }
 
+    clear();
+
     current->state->execute();
 }
 
 template<int S, int E>
 void StateMachine<S, E>::clear() {
-    if(current==nullptr) {
-        return;
-    }
-
-    for(int i=0; i<E; i++) {
-        if(current->transitions[i].event!=nullptr) {
-            current->transitions[i].event->is_triggered = false;
+    for(int i=0; i<S; i++) {
+        if(states[i].state!=nullptr) {
+            for(int j=0; j<E; j++) {
+                if(states[i].transitions[j].event!=nullptr) {
+                    states[i].transitions[j].event->is_triggered = false;
+                }
+            }
         }
     }
 }
