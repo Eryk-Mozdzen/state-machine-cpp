@@ -1,50 +1,59 @@
 #include <iostream>
 #include "state_machine.h"
 
-class TurnOn : public sm::Event {
+class Context {
 public:
-    void check(const char c) {
-        if(c=='1') {
+    char input;
+};
+
+class TurnOn : public sm::Event<Context> {
+public:
+    bool triggered() {
+        if(context->input=='1') {
             std::cout << "switch on" << std::endl;
-            sm::Event::trigger();
+            return true;
         }
+
+        return false;
     }
 };
 
-class TurnOff : public sm::Event {
+class TurnOff : public sm::Event<Context> {
 public:
-    void check(const char c) {
-        if(c=='2') {
+    bool triggered() {
+        if(context->input=='2') {
             std::cout << "switch off" << std::endl;
-            sm::Event::trigger();
+            return true;
         }
+
+        return false;
     }
 };
 
-class On : public sm::State {
-    void enter() override {
+class On : public sm::State<Context> {
+    void enter() {
         std::cout << "enter On state" << std::endl;
     }
 
-    void execute() override {
+    void execute() {
         std::cout << "execute On state" << std::endl;
     }
 
-    void exit() override {
+    void exit() {
         std::cout << "exit On state" << std::endl;
     }
 };
 
-class Off : public sm::State {
-    void enter() override {
+class Off : public sm::State<Context> {
+    void enter() {
         std::cout << "enter Off state" << std::endl;
     }
 
-    void execute() override {
+    void execute() {
         std::cout << "execute Off state" << std::endl;
     }
 
-    void exit() override {
+    void exit() {
         std::cout << "exit Off state" << std::endl;
     }
 };
@@ -56,17 +65,15 @@ int main() {
     On on;
     Off off;
 
-    sm::StateMachine<5, 5> sm(&on);
+    Context context;
+    sm::StateMachine<2, 2, Context> sm(&on, &context);
 
     sm.transit(&on, &off, &turn_off);
     sm.transit(&off, &on, &turn_on);
+    sm.start();
 
     while(true) {
-        char input;
-        std::cin >> input;
-
-        turn_on.check(input);
-        turn_off.check(input);
+        std::cin >> context.input;
 
         sm.update();
     }

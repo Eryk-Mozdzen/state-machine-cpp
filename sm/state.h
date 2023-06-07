@@ -2,13 +2,21 @@
 
 namespace sm {
 
+template<typename T>
 class State {
-    virtual void enter() {}
-    virtual void execute() {}
-    virtual void exit() {}
+protected:
+    T *context;
 
-    template <int S, int E>
-    friend class StateMachine;
+public:
+    State() : context{nullptr} {}
+
+    void setContext(T *ctx) {
+        context = ctx;
+    }
+
+    virtual void enter() {};
+    virtual void execute() {};
+    virtual void exit() {};
 };
 
 }

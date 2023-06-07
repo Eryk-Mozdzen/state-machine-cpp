@@ -2,29 +2,21 @@
 
 namespace sm {
 
+template<typename T>
 class Event {
-    bool is_triggered;
-
-    virtual void on_clear() {}
-
 protected:
-    Event() : is_triggered{false} {
-
-    }
-
-    void trigger() {
-        is_triggered = true;
-    }
+    T *context;
 
 public:
-    bool isTriggered() const {
-        return is_triggered;
+    Event() : context{nullptr} {}
+
+    void setContext(T *ctx) {
+        context = ctx;
     }
 
-    void clear() {
-        on_clear();
-        is_triggered = false;
-    }
+    virtual bool triggered() = 0;
+    virtual void clear() {}
+    virtual void reset() {}
 };
 
 }
