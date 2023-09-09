@@ -118,6 +118,7 @@ void StateMachine<S, E, T>::update() {
 
     if(transition!=nullptr) {
         current->state->exit();
+        transition->event->action();
         current = transition->next;
         reset_events();
         current->state->enter();
