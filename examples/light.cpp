@@ -39,39 +39,39 @@ public:
     }
 };
 
-class OnState : public smcpp::State<Context> {
+class BrightState : public smcpp::State<Context> {
     using smcpp::State<Context>::State;
 
     void enter() {
-        std::cout << "enter On state" << std::endl;
+        std::cout << "enter bright state" << std::endl;
     }
 
     void execute() {
-        std::cout << "execute On state" << std::endl;
+        std::cout << "execute bright state" << std::endl;
 
         std::cin >> context.input;
     }
 
     void exit() {
-        std::cout << "exit On state" << std::endl;
+        std::cout << "exit bright state" << std::endl;
     }
 };
 
-class OffState : public smcpp::State<Context> {
+class DarkState : public smcpp::State<Context> {
     using smcpp::State<Context>::State;
 
     void enter() {
-        std::cout << "enter Off state" << std::endl;
+        std::cout << "enter dark state" << std::endl;
     }
 
     void execute() {
-        std::cout << "execute Off state" << std::endl;
+        std::cout << "execute dark state" << std::endl;
 
         std::cin >> context.input;
     }
 
     void exit() {
-        std::cout << "exit Off state" << std::endl;
+        std::cout << "exit dark state" << std::endl;
     }
 };
 
@@ -79,17 +79,17 @@ class OffState : public smcpp::State<Context> {
 
 int main() {
     example::Context context;
-    example::TurnOnEvent turn_on(context);
-    example::TurnOffEvent turn_off(context);
-    example::OnState on(context);
-    example::OffState off(context);
+    example::TurnOnEvent on(context);
+    example::TurnOffEvent off(context);
+    example::BrightState bright(context);
+    example::DarkState dark(context);
 
     smcpp::StateMachine<2, 1> sm;
 
-    sm.transit(&on, &off, &turn_off);
-    sm.transit(&off, &on, &turn_on);
+    sm.transit(&bright, &dark, &off);
+    sm.transit(&dark, &bright, &on);
 
-    sm.start(&on);
+    sm.start(&bright);
 
     while(true) {
         sm.update();
