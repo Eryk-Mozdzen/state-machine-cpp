@@ -28,9 +28,6 @@ class StateMachine {
     StateTransition states[S];
     StateTransition *current;
 
-    void clear_events();
-    void reset_events();
-
 public:
     StateMachine();
 
@@ -53,18 +50,18 @@ void StateMachine<S, E>::transit(internal::StateBase *from, internal::StateBase 
     StateTransition *from_transition = nullptr;
     StateTransition *to_transition = nullptr;
 
-    for(int i=0; i<S; i++) {
-        if(states[i].state==from || states[i].state==nullptr) {
-            states[i].state = from;
-            from_transition = &states[i];
+    for(StateTransition &s : states) {
+        if(s.state==from || s.state==nullptr) {
+            s.state = from;
+            from_transition = &s;
             break;
         }
     }
 
-    for(int i=0; i<S; i++) {
-        if(states[i].state==to || states[i].state==nullptr) {
-            states[i].state = to;
-            to_transition = &states[i];
+    for(StateTransition &s : states) {
+        if(s.state==to || s.state==nullptr) {
+            s.state = to;
+            to_transition = &s;
             break;
         }
     }
@@ -74,9 +71,9 @@ void StateMachine<S, E>::transit(internal::StateBase *from, internal::StateBase 
 
     Transition *transition = nullptr;
 
-    for(int i=0; i<E; i++) {
-        if(from_transition->transitions[i].next==nullptr) {
-            transition = &from_transition->transitions[i];
+    for(Transition &t : from_transition->transitions) {
+        if(t.next==nullptr) {
+            transition = &t;
             break;
         }
     }
@@ -91,16 +88,20 @@ template<int S, int E>
 void StateMachine<S, E>::start(internal::StateBase *initial) {
     assert(initial!=nullptr);
 
-    current = nullptr;
-
-    for(int i=0; i<S; i++) {
-        if(states[i].state==initial) {
-            current = &states[i];
+    for(StateTransition &s : states) {
+        if(s.state==initial) {
+            current = &s;
             break;
         }
     }
 
     assert(current!=nullptr);
+
+    for(Transition &t : current->transitions) {
+        if(t.event!=nullptr) {
+            t.event->reset();
+        }
+    }
 
     current->state->enter();
 }
@@ -111,48 +112,30 @@ void StateMachine<S, E>::update() {
 
     Transition *transition = nullptr;
 
-    for(int i=0; i<E; i++) {
-        if(current->transitions[i].event!=nullptr && current->transitions[i].next!=nullptr) {
-            if(current->transitions[i].event->triggered()) {
-                transition = &current->transitions[i];
+    for(Transition &t : current->transitions) {
+        if(t.event!=nullptr) {
+            if(t.event->triggered()) {
+                transition = &t;
                 break;
             }
         }
     }
 
-    clear_events();
-
     if(transition!=nullptr) {
         current->state->exit();
         transition->event->action();
         current = transition->next;
-        reset_events();
+
+        for(Transition &t : current->transitions) {
+            if(t.event!=nullptr) {
+                t.event->reset();
+            }
+        }
+
         current->state->enter();
     }
 
     current->state->execute();
-}
-
-template<int S, int E>
-void StateMachine<S, E>::clear_events() {
-    for(int i=0; i<S; i++) {
-        for(int j=0; j<E; j++) {
-            if(states[i].transitions[j].event!=nullptr) {
-                states[i].transitions[j].event->clear();
-            }
-        }
-    }
-}
-
-template<int S, int E>
-void StateMachine<S, E>::reset_events() {
-    for(int i=0; i<S; i++) {
-        for(int j=0; j<E; j++) {
-            if(states[i].transitions[j].event!=nullptr) {
-                states[i].transitions[j].event->reset();
-            }
-        }
-    }
 }
 
 }

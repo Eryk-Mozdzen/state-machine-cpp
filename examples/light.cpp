@@ -15,7 +15,7 @@ class TurnOnEvent : public smcpp::Event<Context> {
     using smcpp::Event<Context>::Event;
 
 public:
-    bool triggered() {
+    bool triggered() const {
         if(context.input=='1') {
             std::cout << "switch on" << std::endl;
             return true;
@@ -29,7 +29,7 @@ class TurnOffEvent : public smcpp::Event<Context> {
     using smcpp::Event<Context>::Event;
 
 public:
-    bool triggered() {
+    bool triggered() const {
         if(context.input=='2') {
             std::cout << "switch off" << std::endl;
             return true;
@@ -48,8 +48,6 @@ class BrightState : public smcpp::State<Context> {
 
     void execute() {
         std::cout << "execute bright state" << std::endl;
-
-        std::cin >> context.input;
     }
 
     void exit() {
@@ -66,8 +64,6 @@ class DarkState : public smcpp::State<Context> {
 
     void execute() {
         std::cout << "execute dark state" << std::endl;
-
-        std::cin >> context.input;
     }
 
     void exit() {
@@ -92,6 +88,8 @@ int main() {
     sm.start(&bright);
 
     while(true) {
+        std::cin >> context.input;
+
         sm.update();
     }
 }
